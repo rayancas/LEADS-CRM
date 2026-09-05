@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ancore | Gestão de Leads</title>
+<style>
+  :root{
+    --bg:#0A0A0C;
+    --card:#15151C;
+    --card2:#1A1A24;
+    --border:#2A2A38;
+    --red:#DB3937;
+    --red-dim:rgba(219,57,55,0.15);
+    --text:#F2F2F5;
+    --muted:#9A9AA8;
+    --muted2:#6E6E7A;
+    --green:#2ECC71;
+    --amber:#F0A93B;
+    --blue:#4A90D9;
+    --silver:#C9C9D1;
+    --radius:10px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Segoe UI', Roboto, Arial, sans-serif;
+    font-size:14px;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{ font-weight:800; letter-spacing:0.3px; }
+  ::-webkit-scrollbar{ width:8px; height:8px; }
+  ::-webkit-scrollbar-thumb{ background:#2A2A38; border-radius:4px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+
+  /* ---------- HEADER ---------- */
+  header{
+    background:linear-gradient(180deg,#141418,#0A0A0C);
+    border-bottom:3px solid var(--red);
+    padding:14px 22px;
+    display:flex; align-items:center; justify-content:space-between;
+    position:sticky; top:0; z-index:50;
+  }
+  .brand{ display:flex; align-items:center; gap:12px; }
+  .brand-logo{
+    width:38px;height:38px;border-radius:8px;
+    background:var(--red); display:flex;align-items:center;justify-content:center;
+    font-weight:900; font-size:18px; color:#fff; letter-spacing:-1px;
+  }
+  .brand-text h1{ font-size:16px; text-transform:uppercase; letter-spacing:1px; }
+  .brand-text span{ font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px;}
+  nav{ display:flex; gap:4px; flex-wrap:wrap; }
+  nav button{
+    background:transparent; border:1px solid transparent; color:var(--muted);
+    padding:9px 16px; border-radius:8px; font-weight:700; font-size:12.5px;
+    text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; transition:.15s;
+  }
+  nav button:hover{ color:var(--text); background:var(--card2); }
+  nav button.active{ color:#fff; background:var(--red); }
+  .header-right{ display:flex; align-items:center; gap:10px; }
+  .btn{
+    background:var(--card2); border:1px solid var(--border); color:var(--text);
+    padding:9px 14px; border-radius:8px; font-weight:700; font-size:12.5px;
+    cursor:pointer; transition:.15s; display:inline-flex; align-items:center; gap:6px;
+  }
+  .btn:hover{ border-color:var(--red); }
+  .btn-primary{ background:var(--red); border-color:var(--red); color:#fff; }
+  .btn-primary:hover{ background:#c22f2d; }
+  .btn-sm{ padding:6px 10px; font-size:11.5px; border-radius:6px; }
+  .btn-ghost{ background:transparent; border:1px solid var(--border); }
+  .btn-danger{ border-color:var(--red); color:var(--red); background:transparent; }
+  .btn-danger:hover{ background:var(--red-dim); }
+
+  main{ padding:20px 22px 60px; max-width:1500px; margin:0 auto; }
+  .view{ display:none; animation:fade .15s ease; }
+  .view.active{ display:block; }
+  @keyframes fade{ from{opacity:0;} to{opacity:1;} }
+
+  /* ---------- CARDS / GRID ---------- */
+  .grid{ display:grid; gap:14px; }
+  .grid-cols-6{ grid-template-columns:repeat(6,1fr); }
+  .grid-cols-3{ grid-template-columns:repeat(3,1fr); }
+  .grid-cols-2{ grid-template-columns:repeat(2,1fr); }
+  @media(max-width:1100px){ .grid-cols-6{grid-template-columns:repeat(3,1fr);} .grid-cols-3{grid-template-columns:repeat(1,1fr);} .grid-cols-2{grid-template-columns:repeat(1,1fr);} }
+
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+    padding:16px;
+  }
+  .kpi{ display:flex; flex-direction:column; gap:4px; }
+  .kpi .label{ font-size:11px; text-transform:uppercase; letter-spacing:0.6px; color:var(--muted); font-weight:700;}
+  .kpi .value{ font-size:26px; font-weight:900; }
+  .kpi .sub{ font-size:11px; color:var(--muted2); }
+  .kpi.accent-red .value{ color:var(--red); }
+  .kpi.accent-amber .value{ color:var(--amber); }
+  .kpi.accent-green .value{ color:var(--green); }
+
+  .section-title{
+    font-size:13px; text-transform:uppercase; letter-spacing:0.8px; color:var(--silver);
+    font-weight:800; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between;
+  }
+  .section-title small{ color:var(--muted2); font-weight:600; text-transform:none; letter-spacing:0; }
+
+  /* ---------- TASK LISTS ---------- */
+  .task-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:9px 10px; border-radius:8px; border:1px solid var(--border); margin-bottom:6px;
+    background:var(--card2); cursor:pointer; transition:.1s;
+  }
+  .task-row:hover{ border-color:var(--red); }
+  .task-row .t-name{ font-weight:700; font-size:13px; }
+  .task-row .t-meta{ font-size:11px; color:var(--muted); }
+  .badge{
+    font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:20px;
+    text-transform:uppercase; letter-spacing:0.4px; white-space:nowrap;
+  }
+  .badge-red{ background:var(--red-dim); color:#ff6b69; }
+  .badge-amber{ background:rgba(240,169,59,0.15); color:var(--amber); }
+  .badge-green{ background:rgba(46,204,113,0.15); color:var(--green); }
+  .badge-muted{ background:var(--border); color:var(--muted); }
+  .empty-hint{ color:var(--muted2); font-size:12.5px; padding:10px 4px; }
+
+  /* ---------- FUNIL / CHART ---------- */
+  .funnel-bar-row{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .funnel-bar-row .fb-label{ width:150px; font-size:12px; font-weight:700; color:var(--silver); text-align:right; }
+  .funnel-bar-track{ flex:1; background:var(--card2); border-radius:6px; height:22px; position:relative; overflow:hidden; }
+  .funnel-bar-fill{ height:100%; background:linear-gradient(90deg,var(--red),#f16866); border-radius:6px; display:flex; align-items:center; }
+  .funnel-bar-fill span{ margin-left:10px; font-size:12px; font-weight:800; color:#fff; }
+
+  /* ---------- KANBAN ---------- */
+  .kanban{ display:flex; gap:12px; overflow-x:auto; padding-bottom:12px; }
+  .kanban-col{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+    min-width:250px; max-width:250px; display:flex; flex-direction:column; max-height:calc(100vh - 220px);
+  }
+  .kanban-col-head{
+    padding:12px 12px 8px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--card); border-radius:10px 10px 0 0;
+  }
+  .kanban-col-head h4{ font-size:12.5px; text-transform:uppercase; letter-spacing:0.4px; }
+  .kanban-col-head .count{ font-size:11px; color:var(--muted); font-weight:700; }
+  .kanban-body{ padding:10px; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:8px; }
+  .kanban-col.dragover{ border-color:var(--red); background:var(--red-dim); }
+  .lead-card{
+    background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:10px;
+    cursor:grab; transition:.1s;
+  }
+  .lead-card:hover{ border-color:var(--red); }
+  .lead-card .lc-name{ font-weight:800; font-size:13px; margin-bottom:2px; }
+  .lead-card .lc-meta{ font-size:11px; color:var(--muted); margin-bottom:6px; }
+  .lead-card .lc-foot{ display:flex; justify-content:space-between; align-items:center; }
+  .lead-card .lc-days{ font-size:10.5px; color:var(--muted2); }
+
+  /* ---------- TABLE ---------- */
+  .table-wrap{ overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius); }
+  table{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  thead th{
+    background:var(--card2); text-align:left; padding:10px 12px; font-size:11px;
+    text-transform:uppercase; letter-spacing:0.4px; color:var(--muted); border-bottom:1px solid var(--border);
+    white-space:nowrap; position:sticky; top:0;
+  }
+  tbody td{ padding:9px 12px; border-bottom:1px solid var(--border); white-space:nowrap; }
+  tbody tr{ background:var(--card); transition:.1s; }
+  tbody tr:hover{ background:var(--card2); }
+  tbody tr:last-child td{ border-bottom:none; }
+  .row-overdue{ box-shadow:inset 3px 0 0 var(--red); }
+  .row-today{ box-shadow:inset 3px 0 0 var(--amber); }
+
+  /* ---------- FILTER BAR ---------- */
+  .filter-bar{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
+  input,select,textarea{
+    background:var(--card2); border:1px solid var(--border); color:var(--text);
+    padding:8px 10px; border-radius:8px; font-size:12.5px; font-family:inherit;
+  }
+  input:focus,select:focus,textarea:focus{ outline:none; border-color:var(--red); }
+  .search-input{ min-width:220px; }
+  label.f-label{ font-size:10.5px; text-transform:uppercase; color:var(--muted2); font-weight:700; display:block; margin-bottom:4px; letter-spacing:0.4px;}
+  .check-inline{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); }
+
+  /* ---------- MODAL ---------- */
+  .modal-overlay{
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:100;
+    align-items:flex-start; justify-content:center; padding:40px 16px; overflow-y:auto;
+  }
+  .modal-overlay.active{ display:flex; }
+  .modal{
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    width:100%; max-width:640px; padding:22px; max-height:90vh; overflow-y:auto;
+  }
+  .modal-lg{ max-width:820px; }
+  .modal-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  .modal-header h3{ font-size:16px; text-transform:uppercase; letter-spacing:0.5px; }
+  .modal-close{ background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer; line-height:1;}
+  .modal-close:hover{ color:var(--red); }
+  .form-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .form-grid .full{ grid-column:1/-1; }
+  .form-field label{ font-size:11px; text-transform:uppercase; color:var(--muted); font-weight:700; display:block; margin-bottom:5px; letter-spacing:0.4px;}
+  .form-field input, .form-field select, .form-field textarea{ width:100%; }
+  .form-field textarea{ resize:vertical; min-height:60px; }
+  .modal-footer{ display:flex; justify-content:flex-end; gap:8px; margin-top:18px; border-top:1px solid var(--border); padding-top:14px;}
+  hr.sep{ border:none; border-top:1px solid var(--border); margin:16px 0; }
+
+  .cadence-log{ background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:12px; margin-top:10px; }
+  .hist-item{ font-size:11.5px; color:var(--muted); border-left:2px solid var(--red); padding:4px 0 4px 10px; margin-bottom:4px; }
+  .hist-item b{ color:var(--text); }
+
+  /* ---------- SCRIPTS / CADENCE TAB ---------- */
+  .stage-card{ margin-bottom:16px; }
+  .script-row{
+    display:grid; grid-template-columns:70px 1fr 90px 1fr 34px; gap:8px; align-items:center;
+    padding:6px 0; border-bottom:1px solid var(--border);
+  }
+  .script-row:last-child{ border-bottom:none; }
+  .script-row input[type=text], .script-row input[type=number]{ width:100%; }
+  .tag-list{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;}
+  .tag{
+    background:var(--card2); border:1px solid var(--border); border-radius:20px; padding:5px 10px 5px 12px;
+    font-size:12px; display:flex; align-items:center; gap:6px;
+  }
+  .tag button{ background:none; border:none; color:var(--muted2); cursor:pointer; font-size:13px;}
+  .tag button:hover{ color:var(--red); }
+  .add-tag-row{ display:flex; gap:6px; margin-top:10px; }
+  .add-tag-row input{ flex:1; }
+
+  .toast{
+    position:fixed; bottom:20px; right:20px; background:var(--card2); border:1px solid var(--red);
+    color:var(--text); padding:12px 18px; border-radius:8px; font-size:13px; font-weight:700; z-index:200;
+    display:none; box-shadow:0 4px 20px rgba(0,0,0,0.4);
+  }
+  .footer-note{ text-align:center; color:var(--muted2); font-size:11px; margin-top:30px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-logo">A</div>
+    <div class="brand-text">
+      <h1>Ancore Proteção Veicular</h1>
+      <span>Gestão de Carteira de Leads</span>
+    </div>
+  </div>
+  <nav id="mainNav">
+    <button data-view="dashboard" class="active">Dashboard</button>
+    <button data-view="funil">Funil</button>
+    <button data-view="leads">Leads</button>
+    <button data-view="cadencias">Cadências</button>
+    <button data-view="config">Configurações</button>
+  </nav>
+  <div class="header-right">
+    <button class="btn btn-primary" id="btnNovoLead">+ Novo Lead</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ DASHBOARD ============ -->
+  <section class="view active" id="view-dashboard">
+    <div class="grid grid-cols-6" style="margin-bottom:18px;">
+      <div class="card kpi"><div class="label">Total de Leads</div><div class="value" id="kpiTotal">0</div><div class="sub">na carteira</div></div>
+      <div class="card kpi"><div class="label">Leads Ativos</div><div class="value" id="kpiAtivos">0</div><div class="sub">em cadência</div></div>
+      <div class="card kpi accent-red"><div class="label">Atrasados</div><div class="value" id="kpiAtrasados">0</div><div class="sub">tarefas vencidas</div></div>
+      <div class="card kpi accent-amber"><div class="label">Tarefas Hoje</div><div class="value" id="kpiHoje">0</div><div class="sub">contatos previstos</div></div>
+      <div class="card kpi accent-green"><div class="label">Conversão</div><div class="value" id="kpiConversao">0%</div><div class="sub">ganhos / avaliados</div></div>
+      <div class="card kpi"><div class="label">Faturamento no Mês</div><div class="value" id="kpiFaturamento">R$ 0</div><div class="sub">vendas fechadas</div></div>
+    </div>
+
+    <div class="grid grid-cols-3">
+      <div class="card">
+        <div class="section-title">Tarefas Atrasadas <small id="countAtrasadas"></small></div>
+        <div id="listAtrasados"></div>
+      </div>
+      <div class="card">
+        <div class="section-title">Tarefas de Hoje <small id="countHoje"></small></div>
+        <div id="listHoje"></div>
+      </div>
+      <div class="card">
+        <div class="section-title">Próximos 7 Dias <small id="countProximos"></small></div>
+        <div id="listProximos"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <div class="section-title">Funil Comercial</div>
+      <div id="funnelChart"></div>
+    </div>
+  </section>
+
+  <!-- ============ FUNIL (KANBAN) ============ -->
+  <section class="view" id="view-funil">
+    <div class="filter-bar">
+      <div><label class="f-label">Consultor</label><select id="kanbanFiltroConsultor"><option value="">Todos</option></select></div>
+      <div><label class="f-label">Buscar</label><input class="search-input" id="kanbanBusca" placeholder="Nome ou telefone..."></div>
+    </div>
+    <div class="kanban" id="kanbanBoard"></div>
+  </section>
+
+  <!-- ============ LEADS (TABELA) ============ -->
+  <section class="view" id="view-leads">
+    <div class="filter-bar">
+      <div><label class="f-label">Buscar</label><input class="search-input" id="tblBusca" placeholder="Nome, telefone, e-mail..."></div>
+      <div><label class="f-label">Etapa</label><select id="tblFiltroEtapa"><option value="">Todas</option></select></div>
+      <div><label class="f-label">Consultor</label><select id="tblFiltroConsultor"><option value="">Todos</option></select></div>
+      <div><label class="f-label">Origem</label><select id="tblFiltroOrigem"><option value="">Todas</option></select></div>
+      <div style="align-self:flex-end;"><label class="check-inline"><input type="checkbox" id="tblSoAtrasados"> Só atrasados</label></div>
+      <div style="margin-left:auto; align-self:flex-end; display:flex; gap:8px;">
+        <button class="btn btn-ghost btn-sm" id="btnImportar">Importar (colar planilha)</button>
+        <button class="btn btn-ghost btn-sm" id="btnExportar">Exportar CSV</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th><th>Telefone</th><th>Plano de Interesse</th><th>Consultor</th>
+            <th>Etapa</th><th>Último Script</th><th>Próxima Tarefa</th><th>Agendamento</th><th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="leadsTableBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ CADÊNCIAS / SCRIPTS ============ -->
+  <section class="view" id="view-cadencias">
+    <div class="section-title" style="margin-bottom:16px;">
+      Cadência de Follow-up e Funil Perpétuo
+      <small>Sequência padrão: D+1 → D+3 → D+7 → D+14 → D+30 → 2 contatos por mês no Funil Perpétuo</small>
+    </div>
+    <div id="cadenceStages"></div>
+  </section>
+
+  <!-- ============ CONFIGURAÇÕES ============ -->
+  <section class="view" id="view-config">
+    <div class="grid grid-cols-2">
+      <div class="card">
+        <div class="section-title">Consultores</div>
+        <div class="tag-list" id="tagsConsultores"></div>
+        <div class="add-tag-row"><input id="inputNovoConsultor" placeholder="Nome do consultor"><button class="btn btn-sm btn-primary" onclick="addConfigItem('consultores','inputNovoConsultor')">Adicionar</button></div>
+      </div>
+      <div class="card">
+        <div class="section-title">Planos / Interesse do Lead</div>
+        <div class="tag-list" id="tagsPlanos"></div>
+        <div class="add-tag-row"><input id="inputNovoPlano" placeholder="Ex: Proteção Moto"><button class="btn btn-sm btn-primary" onclick="addConfigItem('planos','inputNovoPlano')">Adicionar</button></div>
+      </div>
+      <div class="card">
+        <div class="section-title">Origem do Lead</div>
+        <div class="tag-list" id="tagsOrigens"></div>
+        <div class="add-tag-row"><input id="inputNovaOrigem" placeholder="Ex: Indicação"><button class="btn btn-sm btn-primary" onclick="addConfigItem('origens','inputNovaOrigem')">Adicionar</button></div>
+      </div>
+      <div class="card">
+        <div class="section-title">Motivos de Perda</div>
+        <div class="tag-list" id="tagsMotivos"></div>
+        <div class="add-tag-row"><input id="inputNovoMotivo" placeholder="Ex: Preço"><button class="btn btn-sm btn-primary" onclick="addConfigItem('motivosPerda','inputNovoMotivo')">Adicionar</button></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px;">
+      <div class="section-title">Dados</div>
+      <p style="color:var(--muted); font-size:12.5px; margin-bottom:10px;">Os dados ficam salvos neste navegador (localStorage). Faça backup periodicamente.</p>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-ghost" id="btnBackupJSON">Baixar Backup (JSON)</button>
+        <button class="btn btn-ghost" id="btnRestoreJSON">Restaurar Backup</button>
+        <button class="btn btn-danger" id="btnResetAll">Apagar Todos os Dados</button>
+      </div>
+      <input type="file" id="fileRestore" accept=".json" style="display:none;">
+    </div>
+  </section>
+
+  <div class="footer-note">Ancore Proteção Veicular — Sistema de Gestão de Leads &amp; Follow-up Perpétuo • Rayan Castro</div>
+</main>
+
+<!-- ===================== MODAL LEAD ===================== -->
+<div class="modal-overlay" id="modalLead">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3 id="modalLeadTitle">Novo Lead</h3>
+      <button class="modal-close" onclick="closeModal('modalLead')">&times;</button>
+    </div>
+    <input type="hidden" id="leadId">
+    <!-- Campos internos mantidos para compatibilidade; não aparecem no cadastro -->
+    <input type="hidden" id="fEmail">
+    <input type="hidden" id="fPlano">
+    <input type="hidden" id="fConsultor">
+    <input type="hidden" id="fEtapa">
+    <input type="hidden" id="fStatusAgendamento">
+    <input type="hidden" id="fDataAgendamento">
+    <div class="form-grid">
+      <div class="form-field"><label>Nome</label><input id="fNome" placeholder="Nome completo"></div>
+      <div class="form-field"><label>Telefone</label><input id="fTelefone" placeholder="(00) 00000-0000"></div>
+      <div class="form-field"><label>Data de Captação</label><input type="date" id="fDataCaptacao"></div>
+      <div class="form-field"><label>Origem do Lead</label><select id="fOrigem"></select></div>
+
+
+      <div class="form-field" id="wrapMotivoPerda" style="display:none;"><label>Motivo da Perda</label><select id="fMotivoPerda"></select></div>
+      <div class="form-field" id="wrapValorVenda" style="display:none;"><label>Valor da Venda (mensalidade)</label><input id="fValorVenda" placeholder="R$ 0,00"></div>
+      <div class="form-field" id="wrapDataFechamento" style="display:none;"><label>Data de Fechamento</label><input type="date" id="fDataFechamento"></div>
+
+      <div class="form-field full"><label>Observações</label><textarea id="fObservacoes"></textarea></div>
+    </div>
+
+    <div class="cadence-log">
+      <div class="section-title" style="margin-bottom:8px;">Registrar Contato / Cadência</div>
+      <div class="form-grid">
+        <div class="form-field"><label>Script Utilizado</label><select id="fScript"></select></div>
+        <div class="form-field"><label>Próxima Tarefa (sugerida)</label><input type="date" id="fProximaTarefa"></div>
+        <div class="form-field full"><label>Nota do contato (opcional)</label><input id="fNotaContato" placeholder="Ex: pediu para ligar depois das 18h"></div>
+      </div>
+      <button class="btn btn-primary btn-sm" style="margin-top:10px;" id="btnRegistrarContato">Registrar contato e agendar próxima tarefa</button>
+      <div id="historicoLead" style="margin-top:12px;"></div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-danger" id="btnExcluirLead" style="margin-right:auto;">Excluir Lead</button>
+      <button class="btn btn-ghost" onclick="closeModal('modalLead')">Cancelar</button>
+      <button class="btn btn-primary" id="btnSalvarLead">Salvar Lead</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL IMPORTAR ===================== -->
+<div class="modal-overlay" id="modalImportar">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Importar Leads (colar da planilha)</h3>
+      <button class="modal-close" onclick="closeModal('modalImportar')">&times;</button>
+    </div>
+    <p style="color:var(--muted); font-size:12px; margin-bottom:10px;">
+      Copie as colunas do Excel/Sheets nesta ordem e cole abaixo (separado por TAB, uma linha por lead):<br>
+      <b>Nome | Telefone | Email | Origem | Plano de Interesse | Consultor</b>
+    </p>
+    <textarea id="importarTexto" style="width:100%; min-height:160px;" placeholder="Cole aqui..."></textarea>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modalImportar')">Cancelar</button>
+      <button class="btn btn-primary" id="btnConfirmarImportar">Importar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================================
+   ANCORE - SISTEMA DE GESTÃO DE LEADS E CADÊNCIAS
+   Armazenamento: localStorage (sem dependências externas)
+   ========================================================================= */
+
+const STORAGE_KEY = 'ancoreCRMLeads_v1';
+
+const ETAPAS = [
+  '1. Contato',
+  '2. Diferenciação',
+  '3. Investimento',
+  '4. Negociação',
+  '5. Agendamento',
+  'Venda Ganha',
+  'Venda Perdida'
+];
+
+function defaultConfig(){
+  return {
+    consultores: ['Rayan Castro'],
+    planos: ['Proteção Carro', 'Proteção Moto', 'Proteção Caminhão', 'Frota'],
+    origens: ['Indicação', 'Instagram', 'WhatsApp', 'Panfletagem', 'Ex-associado', 'Outros'],
+    motivosPerda: ['Preço', 'Já possui seguro/proteção', 'Sem interesse no momento', 'Sem retorno', 'Escolheu concorrente', 'Outro'],
+    scriptsPorEtapa: {
+      '1. Contato': [
+        {codigo:'D1', nome:'Follow-up D+1', offset:1, roteiro:'Primeiro follow-up 1 dia após a entrada do lead. Retomar o contexto e buscar resposta objetiva.'},
+        {codigo:'D3', nome:'Follow-up D+3', offset:2, roteiro:'Segundo follow-up. Executar no D+3 da entrada, 2 dias após o D+1.'},
+        {codigo:'D7', nome:'Follow-up D+7', offset:4, roteiro:'Terceiro follow-up. Executar no D+7 da entrada, 4 dias após o D+3.'},
+        {codigo:'D14', nome:'Follow-up D+14', offset:7, roteiro:'Quarto follow-up. Executar no D+14 da entrada, 7 dias após o D+7.'},
+        {codigo:'D30', nome:'Follow-up D+30', offset:16, roteiro:'Quinto follow-up. Executar no D+30 da entrada, 16 dias após o D+14.'},
+        {codigo:'FP1', nome:'Funil Perpétuo 1', offset:15, roteiro:'Após o D+30, manter o lead em relacionamento contínuo. Primeiro toque do ciclo mensal do funil perpétuo.'},
+        {codigo:'FP2', nome:'Funil Perpétuo 2', offset:15, roteiro:'Segundo toque mensal do funil perpétuo. Após este contato, continuar alternando FP1 e FP2 a cada 15 dias.'}
+      ],
+      '2. Diferenciação': [
+        {codigo:'D1', nome:'Follow-up D+1', offset:1, roteiro:'Follow-up 1 dia após o último marco da negociação. Sempre encerrar com próxima data agendada.'},
+        {codigo:'D3', nome:'Follow-up D+3', offset:2, roteiro:'Executar 2 dias após o D+1, mantendo a cadência acumulada até D+3.'},
+        {codigo:'D7', nome:'Follow-up D+7', offset:4, roteiro:'Executar 4 dias após o D+3, mantendo a cadência acumulada até D+7.'},
+        {codigo:'D14', nome:'Follow-up D+14', offset:7, roteiro:'Executar 7 dias após o D+7, mantendo a cadência acumulada até D+14.'},
+        {codigo:'D30', nome:'Follow-up D+30', offset:16, roteiro:'Executar 16 dias após o D+14, completando o ciclo inicial no D+30.'},
+        {codigo:'FP1', nome:'Funil Perpétuo 1', offset:15, roteiro:'Após D+30, primeiro toque do ciclo contínuo: duas mensagens por mês.'},
+        {codigo:'FP2', nome:'Funil Perpétuo 2', offset:15, roteiro:'Segundo toque mensal. Continuar alternando FP1 e FP2 a cada 15 dias.'}
+      ],
+      '3. Investimento': [
+        {codigo:'D1', nome:'Follow-up D+1', offset:1, roteiro:'Follow-up 1 dia após o último marco da negociação. Sempre encerrar com próxima data agendada.'},
+        {codigo:'D3', nome:'Follow-up D+3', offset:2, roteiro:'Executar 2 dias após o D+1, mantendo a cadência acumulada até D+3.'},
+        {codigo:'D7', nome:'Follow-up D+7', offset:4, roteiro:'Executar 4 dias após o D+3, mantendo a cadência acumulada até D+7.'},
+        {codigo:'D14', nome:'Follow-up D+14', offset:7, roteiro:'Executar 7 dias após o D+7, mantendo a cadência acumulada até D+14.'},
+        {codigo:'D30', nome:'Follow-up D+30', offset:16, roteiro:'Executar 16 dias após o D+14, completando o ciclo inicial no D+30.'},
+        {codigo:'FP1', nome:'Funil Perpétuo 1', offset:15, roteiro:'Após D+30, primeiro toque do ciclo contínuo: duas mensagens por mês.'},
+        {codigo:'FP2', nome:'Funil Perpétuo 2', offset:15, roteiro:'Segundo toque mensal. Continuar alternando FP1 e FP2 a cada 15 dias.'}
+      ],
+      '4. Negociação': [
+        {codigo:'D1', nome:'Follow-up D+1', offset:1, roteiro:'Follow-up 1 dia após o último marco da negociação. Sempre encerrar com próxima data agendada.'},
+        {codigo:'D3', nome:'Follow-up D+3', offset:2, roteiro:'Executar 2 dias após o D+1, mantendo a cadência acumulada até D+3.'},
+        {codigo:'D7', nome:'Follow-up D+7', offset:4, roteiro:'Executar 4 dias após o D+3, mantendo a cadência acumulada até D+7.'},
+        {codigo:'D14', nome:'Follow-up D+14', offset:7, roteiro:'Executar 7 dias após o D+7, mantendo a cadência acumulada até D+14.'},
+        {codigo:'D30', nome:'Follow-up D+30', offset:16, roteiro:'Executar 16 dias após o D+14, completando o ciclo inicial no D+30.'},
+        {codigo:'FP1', nome:'Funil Perpétuo 1', offset:15, roteiro:'Após D+30, primeiro toque do ciclo contínuo: duas mensagens por mês.'},
+        {codigo:'FP2', nome:'Funil Perpétuo 2', offset:15, roteiro:'Segundo toque mensal. Continuar alternando FP1 e FP2 a cada 15 dias.'}
+      ],
+      '5. Agendamento': [
+        {codigo:'Verif Comp', nome:'Verificação de Comparecimento', offset:0, roteiro:'Confirmar presença/assinatura no dia agendado.'},
+        {codigo:'VR', nome:'Vídeo de Reforço', offset:0, roteiro:'Enviar vídeo de boas-vindas antes da assinatura.'},
+        {codigo:'DESM1', nome:'Desmarcação 1', offset:0, roteiro:'Reagir à desmarcação, entender o motivo.'},
+        {codigo:'DESM2', nome:'Desmarcação 2', offset:1, roteiro:'Insistir em nova tentativa de remarcação.'},
+        {codigo:'DESM3', nome:'Desmarcação 3', offset:2, roteiro:'Última tentativa antes de considerar perdido.'},
+        {codigo:'REM1', nome:'Remarcação 1', offset:0, roteiro:'Remarcar nova data/horário com o lead.'},
+        {codigo:'REM2', nome:'Remarcação 2', offset:1, roteiro:'Confirmar novamente a nova data.'},
+        {codigo:'REM3', nome:'Remarcação 3', offset:2, roteiro:'Confirmação final 1 dia antes.'},
+        {codigo:'FALT1', nome:'Falta 1 (no-show)', offset:0, roteiro:'Contato pós-falta, entender o que aconteceu.'},
+        {codigo:'FALT2', nome:'Falta 2', offset:1, roteiro:'Insistir em nova tentativa de agendamento.'},
+        {codigo:'FALT3', nome:'Falta 3', offset:2, roteiro:'Última tentativa após falta.'},
+        {codigo:'Resgate', nome:'Resgate', offset:5, roteiro:'Recuperar lead que sumiu na etapa de agendamento.'},
+        {codigo:'Ultimato', nome:'Ultimato', offset:7, roteiro:'Prazo final para agendar.'},
+        {codigo:'Descarte', nome:'Descarte', offset:10, roteiro:'Encerrar tentativas de agendamento.'}
+      ],
+      'Venda Ganha': [
+        {codigo:'PósV', nome:'Pós-venda', offset:1, roteiro:'Contato de boas-vindas, confirmar dados e explicar próximos passos (boleto, app, cartão de associado).'},
+        {codigo:'IND', nome:'Pedido de Indicação', offset:15, roteiro:'Solicitar indicação de amigos/família após boa experiência inicial.'},
+        {codigo:'RT1', nome:'Relacionamento/Retenção 1', offset:30, roteiro:'Check-in de 30 dias, garantir satisfação com o atendimento.'},
+        {codigo:'RT2', nome:'Relacionamento/Retenção 2', offset:60, roteiro:'Check-in de 60 dias.'},
+        {codigo:'RT3', nome:'Relacionamento/Retenção 3', offset:90, roteiro:'Check-in trimestral, reforçar benefícios e evitar cancelamento.'},
+        {codigo:'RT4', nome:'Relacionamento/Retenção 4', offset:180, roteiro:'Check-in semestral.'},
+        {codigo:'RT5', nome:'Relacionamento/Retenção 5', offset:365, roteiro:'Check-in anual / aniversário de adesão.'}
+      ],
+      'Venda Perdida': [
+        {codigo:'Recontato', nome:'Recontato Futuro', offset:90, roteiro:'Tentar recontato futuro (ex: renovação de seguro concorrente vencendo).'}
+      ]
+    }
+  };
+}
+
+let STATE = loadState();
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(!parsed.config) parsed.config = defaultConfig();
+      if(!parsed.leads) parsed.leads = [];
+      return parsed;
+    }
+  }catch(e){ console.error('Erro ao carregar dados', e); }
+  return { leads: [], config: defaultConfig() };
+}
+
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE));
+}
+
+function uid(){ return 'l' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function todayStr(){ const d = new Date(); return d.toISOString().slice(0,10); }
+function fmtDateBR(iso){
+  if(!iso) return '-';
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+function daysDiff(iso){ // negative = overdue
+  if(!iso) return null;
+  const today = new Date(todayStr()+'T00:00:00');
+  const target = new Date(iso+'T00:00:00');
+  return Math.round((target-today)/86400000);
+}
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>{ t.style.display='none'; }, 2600);
+}
+
+/* ---------------- NAV ---------------- */
+document.getElementById('mainNav').addEventListener('click', (e)=>{
+  if(e.target.tagName !== 'BUTTON') return;
+  const view = e.target.dataset.view;
+  document.querySelectorAll('#mainNav button').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  renderAll();
+});
+
+/* ---------------- MODAL HELPERS ---------------- */
+function openModal(id){ document.getElementById(id).classList.add('active'); }
+function closeModal(id){ document.getElementById(id).classList.remove('active'); }
+document.querySelectorAll('.modal-overlay').forEach(ov=>{
+  ov.addEventListener('click', (e)=>{ if(e.target===ov) ov.classList.remove('active'); });
+});
+
+/* ---------------- SELECT POPULATION ---------------- */
+function fillSelect(select, items, placeholder){
+  if(!select) return;
+  if(select.tagName !== 'SELECT'){
+    if(!select.value && items && items.length) select.value = items[0];
+    return;
+  }
+  select.innerHTML = '';
+  if(placeholder){
+    const opt = document.createElement('option');
+    opt.value=''; opt.textContent = placeholder;
+    select.appendChild(opt);
+  }
+  items.forEach(it=>{
+    const opt = document.createElement('option');
+    opt.value = it; opt.textContent = it;
+    select.appendChild(opt);
+  });
+}
+
+function populateStaticSelects(){
+  fillSelect(document.getElementById('fOrigem'), STATE.config.origens, 'Selecione...');
+  fillSelect(document.getElementById('fPlano'), STATE.config.planos, 'Selecione...');
+  fillSelect(document.getElementById('fConsultor'), STATE.config.consultores, 'Selecione...');
+  fillSelect(document.getElementById('fEtapa'), ETAPAS, null);
+  fillSelect(document.getElementById('fMotivoPerda'), STATE.config.motivosPerda, 'Selecione...');
+
+  fillSelect(document.getElementById('tblFiltroEtapa'), ETAPAS, 'Todas');
+  fillSelect(document.getElementById('tblFiltroConsultor'), STATE.config.consultores, 'Todos');
+  fillSelect(document.getElementById('tblFiltroOrigem'), STATE.config.origens, 'Todas');
+  fillSelect(document.getElementById('kanbanFiltroConsultor'), STATE.config.consultores, 'Todos');
+}
+
+function updateScriptSelect(){
+  const etapaField = document.getElementById('fEtapa');
+  if(etapaField && !etapaField.value) etapaField.value = ETAPAS[0];
+  const etapa = etapaField.value;
+  const scripts = STATE.config.scriptsPorEtapa[etapa] || [];
+  const sel = document.getElementById('fScript');
+  sel.innerHTML = '';
+  scripts.forEach(s=>{
+    const opt = document.createElement('option');
+    opt.value = s.codigo;
+    opt.textContent = `${s.codigo} — ${s.nome}`;
+    sel.appendChild(opt);
+  });
+}
+
+/* ---------------- MODAL FIELD VISIBILITY ---------------- */
+function updateFieldVisibility(){
+  const etapa = document.getElementById('fEtapa').value;
+  document.getElementById('wrapMotivoPerda').style.display = etapa==='Venda Perdida' ? 'block' : 'none';
+  document.getElementById('wrapValorVenda').style.display = etapa==='Venda Ganha' ? 'block' : 'none';
+  document.getElementById('wrapDataFechamento').style.display = etapa==='Venda Ganha' ? 'block' : 'none';
+  updateScriptSelect();
+}
+document.getElementById('fEtapa').addEventListener('change', updateFieldVisibility);
+
+/* ---------------- OPEN LEAD MODAL ---------------- */
+function openLeadModal(leadId){
+  populateStaticSelects();
+  const lead = leadId ? STATE.leads.find(l=>l.id===leadId) : null;
+
+  document.getElementById('modalLeadTitle').textContent = lead ? 'Editar Lead' : 'Novo Lead';
+  document.getElementById('leadId').value = lead ? lead.id : '';
+  document.getElementById('fNome').value = lead ? lead.nome : '';
+  document.getElementById('fTelefone').value = lead ? lead.telefone : '';
+  document.getElementById('fEmail').value = lead ? lead.email : '';
+  document.getElementById('fDataCaptacao').value = lead ? lead.dataCaptacao : todayStr();
+  document.getElementById('fOrigem').value = lead ? lead.origem : '';
+  document.getElementById('fPlano').value = lead ? lead.plano : '';
+  document.getElementById('fConsultor').value = lead ? lead.consultor : (STATE.config.consultores[0]||'');
+  document.getElementById('fEtapa').value = lead ? lead.etapa : ETAPAS[0];
+  document.getElementById('fStatusAgendamento').value = lead ? lead.statusAgendamento : 'Não agendou';
+  document.getElementById('fDataAgendamento').value = lead ? (lead.dataAgendamento||'') : '';
+  document.getElementById('fMotivoPerda').value = lead ? (lead.motivoPerda||'') : '';
+  document.getElementById('fValorVenda').value = lead ? (lead.valorVenda||'') : '';
+  document.getElementById('fDataFechamento').value = lead ? (lead.dataFechamento||'') : '';
+  document.getElementById('fObservacoes').value = lead ? (lead.observacoes||'') : '';
+  document.getElementById('fProximaTarefa').value = lead ? (lead.proximaTarefa||'') : '';
+  document.getElementById('fNotaContato').value = '';
+
+  updateFieldVisibility();
+  if(lead) document.getElementById('fScript').value = lead.ultimoScript || '';
+
+  document.getElementById('btnExcluirLead').style.display = lead ? 'inline-flex' : 'none';
+  renderHistorico(lead);
+  openModal('modalLead');
+}
+
+function renderHistorico(lead){
+  const box = document.getElementById('historicoLead');
+  if(!lead || !lead.historico || !lead.historico.length){
+    box.innerHTML = '<div class="empty-hint">Nenhum contato registrado ainda.</div>';
+    return;
+  }
+  box.innerHTML = '<div class="section-title" style="margin-bottom:6px; font-size:11px;">Histórico de Contatos</div>' +
+    lead.historico.slice().reverse().map(h=>
+      `<div class="hist-item"><b>${fmtDateBR(h.data)}</b> — [${h.etapa}] Script <b>${h.script}</b>${h.nota? ' — '+h.nota : ''}</div>`
+    ).join('');
+}
+
+document.getElementById('btnNovoLead').addEventListener('click', ()=> openLeadModal(null));
+
+
+/* ---------------- CADÊNCIA FOLLOW-UP / FUNIL PERPÉTUO ---------------- */
+const FOLLOWUP_SEQUENCE = ['D1','D3','D7','D14','D30','FP1','FP2'];
+function getNextFollowupCode(code){
+  if(code==='FP1') return 'FP2';
+  if(code==='FP2') return 'FP1';
+  const idx = FOLLOWUP_SEQUENCE.indexOf(code);
+  return (idx>=0 && idx < FOLLOWUP_SEQUENCE.length-1) ? FOLLOWUP_SEQUENCE[idx+1] : '';
+}
+function scheduleNextFollowupFromScript(scriptCode, etapa){
+  const scripts = STATE.config.scriptsPorEtapa[etapa] || [];
+  const current = scripts.find(s=>s.codigo===scriptCode);
+  if(!current) return null;
+  const nextDate = new Date(todayStr()+'T00:00:00');
+  nextDate.setDate(nextDate.getDate() + (current.offset || 1));
+  return nextDate.toISOString().slice(0,10);
+}
+
+/* ---------------- REGISTRAR CONTATO ---------------- */
+document.getElementById('btnRegistrarContato').addEventListener('click', ()=>{
+  const etapa = document.getElementById('fEtapa').value;
+  const scriptCode = document.getElementById('fScript').value;
+  const scripts = STATE.config.scriptsPorEtapa[etapa] || [];
+  const scriptObj = scripts.find(s=>s.codigo===scriptCode);
+  const offset = scriptObj ? scriptObj.offset : 1;
+  const nextDate = new Date(todayStr()+'T00:00:00');
+  nextDate.setDate(nextDate.getDate() + offset);
+  const nextIso = nextDate.toISOString().slice(0,10);
+  document.getElementById('fProximaTarefa').value = nextIso;
+  const nextCode = getNextFollowupCode(scriptCode);
+  showToast(`Próxima tarefa: ${fmtDateBR(nextIso)}${nextCode ? ' • próximo toque '+nextCode : ''}`);
+
+  // Push into a temp pending record so it shows when saved
+  window._pendingHistorico = window._pendingHistorico || [];
+  window._pendingHistorico.push({
+    data: todayStr(), etapa, script: scriptCode, nota: document.getElementById('fNotaContato').value
+  });
+
+  const leadId = document.getElementById('leadId').value;
+  if(leadId){
+    const lead = STATE.leads.find(l=>l.id===leadId);
+    if(lead){
+      lead.historico = lead.historico || [];
+      lead.historico.push({data: todayStr(), etapa, script: scriptCode, nota: document.getElementById('fNotaContato').value});
+      lead.ultimoScript = scriptCode;
+      lead.proximaTarefa = nextDate.toISOString().slice(0,10);
+      saveState();
+      renderHistorico(lead);
+    }
+  }
+});
+
+/* ---------------- SALVAR LEAD ---------------- */
+document.getElementById('btnSalvarLead').addEventListener('click', ()=>{
+  const nome = document.getElementById('fNome').value.trim();
+  if(!nome){ showToast('Informe o nome do lead.'); return; }
+
+  let id = document.getElementById('leadId').value;
+  let lead = id ? STATE.leads.find(l=>l.id===id) : null;
+  const isNew = !lead;
+  if(isNew){
+    lead = { id: uid(), historico: [] };
+    STATE.leads.push(lead);
+  }
+
+  lead.nome = nome;
+  lead.telefone = document.getElementById('fTelefone').value.trim();
+  lead.email = document.getElementById('fEmail').value.trim();
+  lead.dataCaptacao = document.getElementById('fDataCaptacao').value || todayStr();
+  lead.origem = document.getElementById('fOrigem').value;
+  lead.plano = document.getElementById('fPlano').value;
+  lead.consultor = document.getElementById('fConsultor').value;
+  lead.etapa = document.getElementById('fEtapa').value;
+  lead.statusAgendamento = document.getElementById('fStatusAgendamento').value;
+  lead.dataAgendamento = document.getElementById('fDataAgendamento').value;
+  lead.motivoPerda = document.getElementById('fMotivoPerda').value;
+  lead.valorVenda = document.getElementById('fValorVenda').value;
+  lead.dataFechamento = document.getElementById('fDataFechamento').value;
+  lead.observacoes = document.getElementById('fObservacoes').value;
+  lead.proximaTarefa = document.getElementById('fProximaTarefa').value;
+  if(document.getElementById('fScript').value) lead.ultimoScript = document.getElementById('fScript').value;
+
+  saveState();
+  closeModal('modalLead');
+  showToast(isNew ? 'Lead criado com sucesso.' : 'Lead atualizado.');
+  renderAll();
+});
+
+document.getElementById('btnExcluirLead').addEventListener('click', ()=>{
+  const id = document.getElementById('leadId').value;
+  if(!id) return;
+  if(!confirm('Tem certeza que deseja excluir este lead? Essa ação não pode ser desfeita.')) return;
+  STATE.leads = STATE.leads.filter(l=>l.id!==id);
+  saveState();
+  closeModal('modalLead');
+  showToast('Lead excluído.');
+  renderAll();
+});
+
+/* ================= DASHBOARD ================= */
+function renderDashboard(){
+  const leads = STATE.leads;
+  const ativos = leads.filter(l=> l.etapa!=='Venda Ganha' && l.etapa!=='Venda Perdida');
+  const atrasados = ativos.filter(l=> l.proximaTarefa && daysDiff(l.proximaTarefa) < 0);
+  const hoje = ativos.filter(l=> l.proximaTarefa && daysDiff(l.proximaTarefa) === 0);
+  const proximos = ativos.filter(l=> l.proximaTarefa && daysDiff(l.proximaTarefa) > 0 && daysDiff(l.proximaTarefa) <= 7);
+
+  const ganhos = leads.filter(l=>l.etapa==='Venda Ganha').length;
+  const perdidos = leads.filter(l=>l.etapa==='Venda Perdida').length;
+  const avaliados = ganhos + perdidos;
+  const conversao = avaliados ? Math.round((ganhos/avaliados)*100) : 0;
+
+  const mesAtual = todayStr().slice(0,7);
+  const faturamento = leads
+    .filter(l=> l.etapa==='Venda Ganha' && l.dataFechamento && l.dataFechamento.slice(0,7)===mesAtual)
+    .reduce((sum,l)=> sum + (parseFloat((l.valorVenda||'0').toString().replace(/[^\d,.-]/g,'').replace(',','.'))||0), 0);
+
+  document.getElementById('kpiTotal').textContent = leads.length;
+  document.getElementById('kpiAtivos').textContent = ativos.length;
+  document.getElementById('kpiAtrasados').textContent = atrasados.length;
+  document.getElementById('kpiHoje').textContent = hoje.length;
+  document.getElementById('kpiConversao').textContent = conversao + '%';
+  document.getElementById('kpiFaturamento').textContent = 'R$ ' + faturamento.toLocaleString('pt-BR', {minimumFractionDigits:2});
+
+  document.getElementById('countAtrasadas').textContent = `(${atrasados.length})`;
+  document.getElementById('countHoje').textContent = `(${hoje.length})`;
+  document.getElementById('countProximos').textContent = `(${proximos.length})`;
+
+  renderTaskList('listAtrasados', atrasados.sort((a,b)=>a.proximaTarefa.localeCompare(b.proximaTarefa)), 'atrasado');
+  renderTaskList('listHoje', hoje, 'hoje');
+  renderTaskList('listProximos', proximos.sort((a,b)=>a.proximaTarefa.localeCompare(b.proximaTarefa)), 'futuro');
+
+  renderFunnelChart(leads);
+}
+
+function renderTaskList(containerId, list, kind){
+  const box = document.getElementById(containerId);
+  if(!list.length){
+    box.innerHTML = '<div class="empty-hint">Nenhuma tarefa aqui. 🎉</div>';
+    return;
+  }
+  box.innerHTML = list.map(l=>{
+    const dd = daysDiff(l.proximaTarefa);
+    let badge = '';
+    if(kind==='atrasado') badge = `<span class="badge badge-red">${Math.abs(dd)}d atrasado</span>`;
+    else if(kind==='hoje') badge = `<span class="badge badge-amber">Hoje</span>`;
+    else badge = `<span class="badge badge-muted">em ${dd}d</span>`;
+    return `<div class="task-row" onclick="openLeadModal('${l.id}')">
+      <div><div class="t-name">${escapeHtml(l.nome)}</div><div class="t-meta">${l.etapa} • ${l.ultimoScript||'—'} • ${l.consultor||'—'}</div></div>
+      ${badge}
+    </div>`;
+  }).join('');
+}
+
+function renderFunnelChart(leads){
+  const box = document.getElementById('funnelChart');
+  const counts = ETAPAS.map(e=> leads.filter(l=>l.etapa===e).length);
+  const max = Math.max(...counts, 1);
+  box.innerHTML = ETAPAS.map((e,i)=>{
+    const pct = Math.round((counts[i]/max)*100);
+    return `<div class="funnel-bar-row">
+      <div class="fb-label">${e}</div>
+      <div class="funnel-bar-track"><div class="funnel-bar-fill" style="width:${Math.max(pct,4)}%"><span>${counts[i]}</span></div></div>
+    </div>`;
+  }).join('');
+}
+
+/* ================= KANBAN (FUNIL) ================= */
+function renderKanban(){
+  populateStaticSelects();
+  const board = document.getElementById('kanbanBoard');
+  const consultorFiltro = document.getElementById('kanbanFiltroConsultor').value;
+  const busca = document.getElementById('kanbanBusca').value.toLowerCase();
+
+  board.innerHTML = ETAPAS.map(etapa=>{
+    let leads = STATE.leads.filter(l=>l.etapa===etapa);
+    if(consultorFiltro) leads = leads.filter(l=>l.consultor===consultorFiltro);
+    if(busca) leads = leads.filter(l=> (l.nome||'').toLowerCase().includes(busca) || (l.telefone||'').includes(busca));
+
+    const cards = leads.map(l=>{
+      const dd = l.proximaTarefa ? daysDiff(l.proximaTarefa) : null;
+      let tag = '';
+      if(dd!==null){
+        if(dd<0) tag = `<span class="badge badge-red">${Math.abs(dd)}d atrasado</span>`;
+        else if(dd===0) tag = `<span class="badge badge-amber">Hoje</span>`;
+        else tag = `<span class="badge badge-muted">${fmtDateBR(l.proximaTarefa)}</span>`;
+      }
+      const diasParado = Math.abs(daysDiff(l.dataCaptacao));
+      return `<div class="lead-card" draggable="true" data-id="${l.id}" ondragstart="onDragStart(event)" onclick="openLeadModal('${l.id}')">
+        <div class="lc-name">${escapeHtml(l.nome)}</div>
+        <div class="lc-meta">${l.plano||'—'} • ${l.consultor||'—'}</div>
+        <div class="lc-foot"><span class="lc-days">${l.ultimoScript||'sem contato'}</span>${tag}</div>
+      </div>`;
+    }).join('');
+
+    return `<div class="kanban-col" data-etapa="${etapa}" ondragover="onDragOver(event)" ondrop="onDrop(event)" ondragleave="onDragLeave(event)">
+      <div class="kanban-col-head"><h4>${etapa}</h4><span class="count">${leads.length} lead(s)</span></div>
+      <div class="kanban-body">${cards || '<div class="empty-hint">Sem leads</div>'}</div>
+    </div>`;
+  }).join('');
+}
+
+function onDragStart(e){ e.dataTransfer.setData('text/plain', e.target.closest('.lead-card').dataset.id); }
+function onDragOver(e){ e.preventDefault(); e.currentTarget.classList.add('dragover'); }
+function onDragLeave(e){ e.currentTarget.classList.remove('dragover'); }
+function onDrop(e){
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover');
+  const id = e.dataTransfer.getData('text/plain');
+  const novaEtapa = e.currentTarget.dataset.etapa;
+  const lead = STATE.leads.find(l=>l.id===id);
+  if(lead && lead.etapa !== novaEtapa){
+    lead.etapa = novaEtapa;
+    saveState();
+    showToast(`${lead.nome} movido para "${novaEtapa}"`);
+    renderAll();
+  }
+}
+document.getElementById('kanbanFiltroConsultor').addEventListener('change', renderKanban);
+document.getElementById('kanbanBusca').addEventListener('input', renderKanban);
+
+/* ================= TABELA DE LEADS ================= */
+function renderLeadsTable(){
+  populateStaticSelects();
+  const busca = document.getElementById('tblBusca').value.toLowerCase();
+  const fEtapa = document.getElementById('tblFiltroEtapa').value;
+  const fConsultor = document.getElementById('tblFiltroConsultor').value;
+  const fOrigem = document.getElementById('tblFiltroOrigem').value;
+  const soAtrasados = document.getElementById('tblSoAtrasados').checked;
+
+  let leads = STATE.leads.slice();
+  if(busca) leads = leads.filter(l=> (l.nome||'').toLowerCase().includes(busca) || (l.telefone||'').includes(busca) || (l.email||'').toLowerCase().includes(busca));
+  if(fEtapa) leads = leads.filter(l=>l.etapa===fEtapa);
+  if(fConsultor) leads = leads.filter(l=>l.consultor===fConsultor);
+  if(fOrigem) leads = leads.filter(l=>l.origem===fOrigem);
+  if(soAtrasados) leads = leads.filter(l=> l.proximaTarefa && daysDiff(l.proximaTarefa) < 0);
+
+  leads.sort((a,b)=> (a.proximaTarefa||'9999').localeCompare(b.proximaTarefa||'9999'));
+
+  const tbody = document.getElementById('leadsTableBody');
+  if(!leads.length){
+    tbody.innerHTML = `<tr><td colspan="9" class="empty-hint">Nenhum lead encontrado.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = leads.map(l=>{
+    let rowClass = '';
+    let tarefaCell = fmtDateBR(l.proximaTarefa);
+    if(l.proximaTarefa){
+      const dd = daysDiff(l.proximaTarefa);
+      if(dd<0){ rowClass='row-overdue'; tarefaCell = `${fmtDateBR(l.proximaTarefa)} <span class="badge badge-red">${Math.abs(dd)}d</span>`; }
+      else if(dd===0){ rowClass='row-today'; tarefaCell = `${fmtDateBR(l.proximaTarefa)} <span class="badge badge-amber">Hoje</span>`; }
+    } else { tarefaCell = '-'; }
+
+    return `<tr class="${rowClass}">
+      <td>${escapeHtml(l.nome)}</td>
+      <td>${escapeHtml(l.telefone||'-')}</td>
+      <td>${l.plano||'-'}</td>
+      <td>${l.consultor||'-'}</td>
+      <td>${l.etapa}</td>
+      <td>${l.ultimoScript||'-'}</td>
+      <td>${tarefaCell}</td>
+      <td>${l.statusAgendamento||'-'}</td>
+      <td>
+        <button class="btn btn-sm btn-ghost" onclick="openLeadModal('${l.id}')">Editar</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+['tblBusca','tblFiltroEtapa','tblFiltroConsultor','tblFiltroOrigem','tblSoAtrasados'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', renderLeadsTable);
+  document.getElementById(id).addEventListener('change', renderLeadsTable);
+});
+
+/* ---------------- EXPORTAR CSV ---------------- */
+document.getElementById('btnExportar').addEventListener('click', ()=>{
+  const headers = ['Nome','Telefone','Email','Data Captacao','Origem','Plano','Consultor','Etapa','Ultimo Script','Proxima Tarefa','Status Agendamento','Data Agendamento','Valor Venda','Data Fechamento','Motivo Perda','Observacoes'];
+  const rows = STATE.leads.map(l=>[
+    l.nome,l.telefone,l.email,l.dataCaptacao,l.origem,l.plano,l.consultor,l.etapa,l.ultimoScript,l.proximaTarefa,l.statusAgendamento,l.dataAgendamento,l.valorVenda,l.dataFechamento,l.motivoPerda,(l.observacoes||'').replace(/\n/g,' ')
+  ]);
+  const csv = [headers.join(';'), ...rows.map(r=>r.map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(';'))].join('\n');
+  const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `leads_ancore_${todayStr()}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+/* ---------------- IMPORTAR (COLAR) ---------------- */
+document.getElementById('btnImportar').addEventListener('click', ()=> openModal('modalImportar'));
+document.getElementById('btnConfirmarImportar').addEventListener('click', ()=>{
+  const texto = document.getElementById('importarTexto').value.trim();
+  if(!texto){ showToast('Cole os dados antes de importar.'); return; }
+  const linhas = texto.split('\n').map(l=>l.trim()).filter(Boolean);
+  let count = 0;
+  linhas.forEach(linha=>{
+    const cols = linha.split('\t');
+    if(!cols[0]) return;
+    STATE.leads.push({
+      id: uid(),
+      nome: cols[0]||'',
+      telefone: cols[1]||'',
+      email: cols[2]||'',
+      origem: cols[3]||'',
+      plano: cols[4]||'',
+      consultor: cols[5]|| (STATE.config.consultores[0]||''),
+      dataCaptacao: todayStr(),
+      etapa: ETAPAS[0],
+      statusAgendamento: 'Não agendou',
+      historico: []
+    });
+    count++;
+  });
+  saveState();
+  document.getElementById('importarTexto').value = '';
+  closeModal('modalImportar');
+  showToast(`${count} lead(s) importado(s).`);
+  renderAll();
+});
+
+/* ================= CADÊNCIAS / SCRIPTS ================= */
+function renderCadencias(){
+  const box = document.getElementById('cadenceStages');
+  box.innerHTML = ETAPAS.map(etapa=>{
+    const scripts = STATE.config.scriptsPorEtapa[etapa] || [];
+    const rows = scripts.map((s,idx)=>`
+      <div class="script-row">
+        <input type="text" value="${escapeHtml(s.codigo)}" onchange="updateScriptField('${etapa}',${idx},'codigo',this.value)">
+        <input type="text" value="${escapeHtml(s.nome)}" onchange="updateScriptField('${etapa}',${idx},'nome',this.value)">
+        <input type="number" value="${s.offset}" onchange="updateScriptField('${etapa}',${idx},'offset',parseInt(this.value)||0)" title="dias até próxima tarefa">
+        <input type="text" value="${escapeHtml(s.roteiro||'')}" placeholder="Orientação do roteiro..." onchange="updateScriptField('${etapa}',${idx},'roteiro',this.value)">
+        <button class="btn btn-sm btn-danger" onclick="removeScript('${etapa}',${idx})">✕</button>
+      </div>`).join('');
+
+    return `<div class="card stage-card">
+      <div class="section-title">${etapa} <small>${scripts.length} script(s)</small></div>
+      <div class="script-row" style="font-size:10.5px; color:var(--muted2); text-transform:uppercase; border-bottom:1px solid var(--border); padding-bottom:6px;">
+        <div>Código</div><div>Nome</div><div>Dias p/ próx.</div><div>Roteiro</div><div></div>
+      </div>
+      ${rows || '<div class="empty-hint">Nenhum script cadastrado.</div>'}
+      <div class="add-tag-row">
+        <input type="text" id="newCode_${sanitizeId(etapa)}" placeholder="Código (ex: CD4)">
+        <input type="text" id="newName_${sanitizeId(etapa)}" placeholder="Nome do script">
+        <input type="number" id="newOffset_${sanitizeId(etapa)}" placeholder="Dias" style="max-width:80px;">
+        <button class="btn btn-sm btn-primary" onclick="addScript('${etapa}')">Adicionar script</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function sanitizeId(str){ return str.replace(/[^a-zA-Z0-9]/g,''); }
+function updateScriptField(etapa, idx, field, value){
+  STATE.config.scriptsPorEtapa[etapa][idx][field] = value;
+  saveState();
+}
+function removeScript(etapa, idx){
+  STATE.config.scriptsPorEtapa[etapa].splice(idx,1);
+  saveState();
+  renderCadencias();
+}
+function addScript(etapa){
+  const codigo = document.getElementById('newCode_'+sanitizeId(etapa)).value.trim();
+  const nome = document.getElementById('newName_'+sanitizeId(etapa)).value.trim();
+  const offset = parseInt(document.getElementById('newOffset_'+sanitizeId(etapa)).value) || 1;
+  if(!codigo || !nome){ showToast('Preencha código e nome do script.'); return; }
+  STATE.config.scriptsPorEtapa[etapa].push({codigo, nome, offset, roteiro:''});
+  saveState();
+  renderCadencias();
+  showToast('Script adicionado.');
+}
+
+/* ================= CONFIGURAÇÕES (TAGS) ================= */
+function renderConfigTags(){
+  renderTagList('tagsConsultores','consultores');
+  renderTagList('tagsPlanos','planos');
+  renderTagList('tagsOrigens','origens');
+  renderTagList('tagsMotivos','motivosPerda');
+}
+function renderTagList(containerId, key){
+  const box = document.getElementById(containerId);
+  const items = STATE.config[key];
+  box.innerHTML = items.map((it,idx)=>`<div class="tag">${escapeHtml(it)}<button onclick="removeConfigItem('${key}',${idx})">✕</button></div>`).join('') || '<div class="empty-hint">Nenhum item.</div>';
+}
+function addConfigItem(key, inputId){
+  const input = document.getElementById(inputId);
+  const val = input.value.trim();
+  if(!val) return;
+  if(STATE.config[key].includes(val)){ showToast('Item já existe.'); return; }
+  STATE.config[key].push(val);
+  input.value = '';
+  saveState();
+  renderConfigTags();
+  populateStaticSelects();
+}
+function removeConfigItem(key, idx){
+  STATE.config[key].splice(idx,1);
+  saveState();
+  renderConfigTags();
+  populateStaticSelects();
+}
+
+/* ---------------- BACKUP / RESTORE ---------------- */
+document.getElementById('btnBackupJSON').addEventListener('click', ()=>{
+  const blob = new Blob([JSON.stringify(STATE, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `backup_leads_ancore_${todayStr()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+document.getElementById('btnRestoreJSON').addEventListener('click', ()=> document.getElementById('fileRestore').click());
+document.getElementById('fileRestore').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (evt)=>{
+    try{
+      const data = JSON.parse(evt.target.result);
+      if(!data.leads || !data.config) throw new Error('Formato inválido');
+      STATE = data;
+      saveState();
+      showToast('Backup restaurado com sucesso.');
+      renderAll();
+    }catch(err){ showToast('Arquivo inválido.'); }
+  };
+  reader.readAsText(file);
+});
+document.getElementById('btnResetAll').addEventListener('click', ()=>{
+  if(!confirm('Isso vai apagar TODOS os leads e configurações. Deseja continuar?')) return;
+  STATE = { leads: [], config: defaultConfig() };
+  saveState();
+  showToast('Dados apagados.');
+  renderAll();
+});
+
+/* ---------------- UTIL ---------------- */
+function escapeHtml(str){
+  if(str===undefined || str===null) return '';
+  return str.toString().replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+/* ---------------- RENDER ALL ---------------- */
+function renderAll(){
+  populateStaticSelects();
+  renderDashboard();
+  renderKanban();
+  renderLeadsTable();
+  renderCadencias();
+  renderConfigTags();
+}
+
+renderAll();
+</script>
+</body>
+</html>
